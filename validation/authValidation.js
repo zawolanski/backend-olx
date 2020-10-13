@@ -10,7 +10,7 @@ exports.validateSignUp = [
             if (doc) return Promise.reject('E-mail już istnieje.');
           })
       }),
-    body('password', 'Tylko liczby i litery. Długość od 5 do 20 znaków.')
+    body('password', 'Tylko liczby i litery. Długość od 5 do 25 znaków.')
       .trim()
       .matches(/^[A-Z0-9]+$/i)
       .isLength({
@@ -25,10 +25,10 @@ exports.validateSignUp = [
         }
         return true;
       }),
-      (req, res, next) => {
+    (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty())
             return res.status(422).json({ message: 'Validation failed!', errors: errors.array(), success: false });
         next();
-      },
+    },
 ]

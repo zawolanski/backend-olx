@@ -8,7 +8,7 @@ exports.signUp = async (req, res, next) => {
   const password = req.body.password;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 15);
+    const hashedPassword = await bcryp.hash(password, 15);
     const user = new User({
       email,
       password: hashedPassword,
@@ -19,7 +19,7 @@ exports.signUp = async (req, res, next) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    next('Wystąpił bład serwera!');
   }
 };
 
@@ -29,12 +29,16 @@ exports.signIn = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('Użytkownik o podanym adresie email nie istnieje.');
+      const error = new Error('Użytkownik o podanym adresie email nie istnieje.');
+      error.statusCode = 401;
+      throw error;
     }
 
     const isEqual = await bcrypt.compare(password, user.password);
     if (!isEqual) {
-      throw new Error('Niepoprawne hasło!');
+      const error = new Error('Niepoprawne hasło!');
+      error.statusCode = 401;
+      throw error;
     }
 
     const token = jwt.sign(
@@ -42,7 +46,7 @@ exports.signIn = async (req, res, next) => {
         email: user.email,
         user_id: user._id.toString(),
       },
-      'sebastianzawolanski',
+      process.env.JWT_TOKEN,
       { expiresIn: '2h' },
     );
 
@@ -52,9 +56,6 @@ exports.signIn = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    res.status(401).json({
-      message: error.message,
-      success: false,
-    });
+    next(error);
   }
 };

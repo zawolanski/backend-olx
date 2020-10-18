@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const User = require('./models/user');
 
 const userRouter = require('./routes/auth');
+const announcementRouter = require('./routes/announcement');
 
 require('dotenv').config();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use(userRouter);
+app.use(announcementRouter);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;

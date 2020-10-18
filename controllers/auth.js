@@ -14,12 +14,18 @@ exports.signUp = async (req, res, next) => {
       password: hashedPassword,
     });
     const doc = await user.save();
-    res.status(201).json({
-      message: 'Użytkownik utworzony pomyślnie!',
-      success: true,
-    });
+    if (doc && hashedPassword)
+      res.status(201).json({
+        message: 'Użytkownik utworzony pomyślnie!',
+        success: true,
+      });
+    else {
+      const error = new Error('Wystąpił błąd podczas dodawania ogłoszenia.');
+      error.statusCode = 406;
+      throw error;
+    }
   } catch (error) {
-    next('Wystąpił bład serwera!');
+    next(error);
   }
 };
 

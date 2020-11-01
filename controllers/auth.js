@@ -8,7 +8,7 @@ exports.signUp = async (req, res, next) => {
   const password = req.body.password;
 
   try {
-    const hashedPassword = await bcryp.hash(password, 15);
+    const hashedPassword = await bcrypt.hash(password, 15);
     const user = new User({
       email,
       password: hashedPassword,
@@ -20,7 +20,7 @@ exports.signUp = async (req, res, next) => {
         success: true,
       });
     else {
-      const error = new Error('Wystąpił błąd podczas dodawania ogłoszenia.');
+      const error = new Error('Wystąpił błąd podczas rejestracji.');
       error.statusCode = 406;
       throw error;
     }
@@ -60,6 +60,27 @@ exports.signIn = async (req, res, next) => {
       message: 'Użytkownik zalogowany pomyślnie!',
       success: true,
       token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getUser = async (req, res, next) => {
+  const userId = req.userId;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('Użytkownik nie istnieje.');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    res.status(201).json({
+      user: {
+        email: user.email,
+      },
+      success: true,
     });
   } catch (error) {
     next(error);

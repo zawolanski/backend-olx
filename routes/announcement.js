@@ -10,7 +10,7 @@ const Router = express.Router();
 
 Router.get('/getAnnoucements', announcementContoller.getAnnoucements);
 
-Router.post('/getAnnoucement', announcementContoller.getAnnoucement);
+Router.get('/getAnnoucement/:annId', announcementContoller.getAnnoucement);
 
 Router.put(
   '/addAnnoucement',
@@ -24,7 +24,5 @@ Router.patch('/updateAnnoucement');
 Router.delete('/removeAnnoucement/:annId', announcementContoller.removeAnnoucement);
 
 Router.put('/addCategory', announcementContoller.addCategory);
-
-Router.get('/getCategories', announcementContoller.getCategories);
 
 module.exports = Router;

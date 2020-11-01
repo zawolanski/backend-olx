@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
-const User = require('./models/user');
+const multer = require('multer');
 
 const userRouter = require('./routes/auth');
 const announcementRouter = require('./routes/announcement');
@@ -11,10 +11,32 @@ const announcementRouter = require('./routes/announcement');
 require('dotenv').config();
 
 const app = express();
-
 app.use(cors());
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toString() + '-' + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.use(bodyParser.json());
+app.use(multer({ storage, fileFilter }).single('photo'));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(userRouter);
 app.use(announcementRouter);

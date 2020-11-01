@@ -1,6 +1,7 @@
 const Announcement = require('../models/announcement');
 const Category = require('../models/category');
 const User = require('../models/user');
+const fileHelper = require('../util/fileHelper');
 
 exports.addAnnoucement = async (req, res, next) => {
   const title = req.body.title;
@@ -8,13 +9,23 @@ exports.addAnnoucement = async (req, res, next) => {
   const description = req.body.description;
   const phone_number = req.body.phone_number;
   const localization = req.body.localization;
-  const user_id = req.body.user_id;
+  const user_id = req.userId;
   const category_id = req.body.category_id;
+  const photo = req.file;
 
   try {
+    if (!photo) {
+      const error = new Error('Wystąpił problem z przesłaniem zdjęcia.');
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const imageUrl = photo.path;
+
     const categoryDoc = await Category.findById(category_id);
 
     if (!categoryDoc) {
+      fileHelper.deleteFile(imageUrl);
       const error = new Error('Wystąpił błąd podczas dodawania ogłoszenia.');
       error.statusCode = 406;
       throw error;
@@ -23,6 +34,7 @@ exports.addAnnoucement = async (req, res, next) => {
     const userDoc = await User.findById(user_id);
 
     if (!userDoc) {
+      fileHelper.deleteFile(imageUrl);
       const error = new Error('Wystąpił błąd podczas dodawania ogłoszenia.');
       error.statusCode = 406;
       throw error;
@@ -36,6 +48,7 @@ exports.addAnnoucement = async (req, res, next) => {
       localization,
       category_id,
       user_id,
+      imageUrl,
     });
 
     const doc = await announcement.save();
@@ -69,15 +82,21 @@ exports.getAnnoucements = async (req, res, next) => {
 };
 
 exports.getAnnoucement = async (req, res, next) => {
-  const ann_id = req.body.ann_id;
+  const ann_id = req.params.annId;
 
   try {
     const annoucement = await Announcement.findById(ann_id);
-    res.status(201).json({
-      annoucement: annoucement.length === 0 ? [] : annoucement,
-      message: 'Dane pobrane pomyślnie!',
-      success: true,
-    });
+    if (annoucement) {
+      res.status(201).json({
+        annoucement: annoucement,
+        message: 'Ogłoszenie pobrane pomyślnie!',
+        success: true,
+      });
+    } else {
+      const error = new Error('Nie znaleziono ogłoszenia!');
+      error.statusCode = 404;
+      throw error;
+    }
   } catch (error) {
     next(error);
   }

@@ -87,7 +87,7 @@ exports.getAnnoucement = async (req, res, next) => {
   try {
     const annoucement = await Announcement.findById(ann_id);
     if (annoucement) {
-      res.status(201).json({
+      res.status(200).json({
         annoucement: annoucement,
         message: 'Ogłoszenie pobrane pomyślnie!',
         success: true,
@@ -99,6 +99,22 @@ exports.getAnnoucement = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+  }
+};
+
+exports.getUserAnnoucements = async (req, res, next) => {
+  const user_id = req.params.userId;
+
+  try {
+    const userAnnoucement = await Announcement.find({ user_id });
+
+    res.status(200).json({
+      annoucements: userAnnoucement,
+      message: 'Dane pobrane pomyślnie!',
+      success: true,
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -140,7 +156,7 @@ exports.addCategory = async (req, res, next) => {
     });
     const doc = await category.save();
     if (doc)
-      res.status(201).json({
+      res.status(200).json({
         message: 'Kategoria utworzona pomyślnie!',
         success: true,
       });

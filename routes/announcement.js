@@ -12,6 +12,8 @@ Router.get('/getAnnoucements', announcementContoller.getAnnoucements);
 
 Router.get('/getAnnoucement/:annId', announcementContoller.getAnnoucement);
 
+Router.get('/getUserAnnoucements/:userId', announcementContoller.getUserAnnoucements);
+
 Router.put(
   '/addAnnoucement',
   isAuth,

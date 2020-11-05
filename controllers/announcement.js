@@ -85,7 +85,7 @@ exports.getAnnoucement = async (req, res, next) => {
   const ann_id = req.params.annId;
 
   try {
-    const annoucement = await Announcement.findById(ann_id);
+    const annoucement = await Announcement.findById(ann_id).populate('user_id');
     if (annoucement) {
       res.status(200).json({
         annoucement: annoucement,
@@ -108,11 +108,24 @@ exports.getUserAnnoucements = async (req, res, next) => {
   try {
     const userAnnoucement = await Announcement.find({ user_id });
 
-    res.status(200).json({
-      annoucements: userAnnoucement,
-      message: 'Dane pobrane pomyślnie!',
-      success: true,
-    });
+    const user = await User.findById(user_id);
+
+    if (userAnnoucement && user) {
+      console.log(user);
+      res.status(200).json({
+        annoucements: userAnnoucement,
+        user: {
+          user_id: user._id.toString(),
+          email: user.email,
+        },
+        message: 'Dane pobrane pomyślnie!',
+        success: true,
+      });
+    } else {
+      const error = new Error('Nie znaleziono ogłoszenia!');
+      error.statusCode = 404;
+      throw error;
+    }
   } catch (err) {
     next(err);
   }
@@ -135,6 +148,7 @@ exports.removeAnnoucement = async (req, res, next) => {
 
       res.status(201).json({
         message: 'Ogłoszenie usunięte pomyslnie!',
+        annoucement: deletedAnn,
         success: true,
       });
     } else {

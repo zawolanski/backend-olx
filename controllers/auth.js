@@ -60,6 +60,7 @@ exports.signIn = async (req, res, next) => {
       message: 'Użytkownik zalogowany pomyślnie!',
       success: true,
       token,
+      user_id: user._id.toString(),
     });
   } catch (error) {
     next(error);

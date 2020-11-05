@@ -23,7 +23,7 @@ Router.put(
 
 Router.patch('/updateAnnoucement');
 
-Router.delete('/removeAnnoucement/:annId', announcementContoller.removeAnnoucement);
+Router.delete('/removeAnnoucement/:annId', isAuth, announcementContoller.removeAnnoucement);
 
 Router.put('/addCategory', announcementContoller.addCategory);
 

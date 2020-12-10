@@ -111,12 +111,12 @@ exports.getUserAnnoucements = async (req, res, next) => {
     const user = await User.findById(user_id);
 
     if (userAnnoucement && user) {
-      console.log(user);
       res.status(200).json({
         annoucements: userAnnoucement,
         user: {
           user_id: user._id.toString(),
           email: user.email,
+          name: user.name || '',
         },
         message: 'Dane pobrane pomyślnie!',
         success: true,

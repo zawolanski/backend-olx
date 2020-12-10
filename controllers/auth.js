@@ -87,3 +87,35 @@ exports.getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.addName = async (req, res, next) => {
+  const userId = req.userId;
+  const userName = req.body.username;
+
+  console.log(req.body);
+
+  let result;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('Użytkownik nie istnieje.');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    if (userName !== undefined)
+      result = await User.updateOne({ _id: userId }, { $set: { name: userName } });
+    else {
+      const error = new Error('Nie podano imienia.');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    res.status(201).json({
+      message: 'Imię zaktualizowane pomyślnie.',
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
